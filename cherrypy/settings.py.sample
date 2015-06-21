@@ -1,0 +1,20 @@
+# Server name
+NAME = "My Test Server"
+DESCRIPTION = """A short description of the server. This will be shown in
+Drawpile's listing server list."""
+
+# URL to favicon
+FAVICON = ''
+
+# Sessions must be refreshed at least this often or they time out
+SESSION_TIMEOUT = '15 minutes'
+
+# Maximum number of simultaneous announcements
+RATELIMIT = 5
+
+# A function for opening a database connection
+import psycopg2 as dbdriver
+
+
+def db():
+    return dbdriver.connect("dbname=drawpile")
