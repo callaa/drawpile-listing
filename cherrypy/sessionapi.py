@@ -172,7 +172,7 @@ class Session(object):
 
         sql = '''INSERT INTO drawpile_sessions
 			(host, port, session_id, protocol, owner, title, users, password, update_key, client_ip) 
-			VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)'''
+			VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s) RETURNING id'''
 
         with settings.db() as conn:
             with conn.cursor() as cur:
@@ -215,7 +215,7 @@ class Session(object):
                 except KeyError as ke:
                     raise cherrypy.HTTPError(422, "BADDATA:" + str(ke))
 
-                pk = cur.lastrowid
+                pk = cur.fetchone()[0]
 
                 return (pk, update_key)
 
