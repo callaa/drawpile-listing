@@ -148,7 +148,7 @@ class Session(object):
         row = cursor.fetchone()
         if not row:
             raise cherrypy.HTTPError(404)
-        elif row[0] != cherrypy.request.headers.get('HTTP_X_UPDATE_JEY'):
+        elif row[0] != cherrypy.request.headers.get('X-Update-Key'):
             raise cherrypy.HTTPError(403)
 
     @classmethod
