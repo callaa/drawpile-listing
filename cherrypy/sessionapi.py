@@ -138,14 +138,14 @@ class Session(object):
 
     def _check_update_key(self, cursor):
         """Check if the given update key is valid for the listing"""
-        cur.execute(
+        cursor.execute(
             """SELECT update_key FROM drawpile_sessions
 			WHERE id=%s
 			AND unlisted=false
 			AND last_active >= current_timestamp - interval %s""",
             [self.pk, settings.SESSION_TIMEOUT]
         )
-        row = cur.fetchone()
+        row = cursor.fetchone()
         if not row:
             raise cherrypy.HTTPError(404)
         elif row[0] != cherrypy.request.headers.get('HTTP_X_UPDATE_JEY'):
