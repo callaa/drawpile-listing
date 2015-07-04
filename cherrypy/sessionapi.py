@@ -58,7 +58,10 @@ class Sessions(object):
         """Announce a new session"""
         data = cherrypy.request.json
 
-        pk, updatekey = Session.create(data, cherrypy.request.remote.ip)
+        # Note: X-Real-Ip is used with nginx proxying
+        remoteip = cherrypy.request.headers.get('x-real-ip', cherrypy.request.remote.ip)
+
+        pk, updatekey = Session.create(data, remoteip)
 
         return {
             'id': pk,
