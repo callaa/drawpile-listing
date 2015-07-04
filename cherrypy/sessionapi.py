@@ -221,7 +221,10 @@ class Session(object):
 
     def to_json(self):
         json = {a: getattr(self, a) for a in self.ATTRS}
-        json['started'] = unicode(json['started'])
+
+        s = json['started'].utctimetuple()
+        json['started'] = '{:#04}-{:#02}-{:#02} {:#02}:{:#02}:{:#02}'.format(*s[0:6])
+
         return json
 
 
