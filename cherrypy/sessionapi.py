@@ -32,7 +32,7 @@ class Sessions(object):
     """Session listing API"""
     exposed = True
 
-    def GET(self):
+    def GET(self, protocol=None):
         """Get list of active sessions"""
 
         sql = '''
@@ -40,6 +40,10 @@ class Sessions(object):
 			FROM drawpile_sessions
 			WHERE unlisted=false AND last_active >= current_timestamp - interval %s'''
         params = [settings.SESSION_TIMEOUT]
+
+        if protocol:
+            sql += " AND protocol=%s"
+            params.append(protocol)
 
         with settings.db() as conn:
             with conn.cursor() as cur:
