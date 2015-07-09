@@ -20,7 +20,7 @@ class SessionListingApi(object):
     def GET(self):
         return {
             'api_name': 'drawpile-session-list',
-            'version': '1.0',
+            'version': '1.1',
             'name': settings.NAME,
             'description': settings.DESCRIPTION,
             'favicon': settings.FAVICON,
@@ -32,11 +32,11 @@ class Sessions(object):
     """Session listing API"""
     exposed = True
 
-    def GET(self, protocol=None):
+    def GET(self, protocol=None, nsfm="false", **kwargs):
         """Get list of active sessions"""
 
         sql = '''
-			SELECT host, port, session_id as id, protocol, owner, title, users, password, started
+			SELECT host, port, session_id as id, protocol, owner, title, users, password, nsfm, started
 			FROM drawpile_sessions
 			WHERE unlisted=false AND last_active >= current_timestamp - interval %s'''
         params = [settings.SESSION_TIMEOUT]
@@ -44,6 +44,9 @@ class Sessions(object):
         if protocol:
             sql += " AND protocol=%s"
             params.append(protocol)
+
+        if nsfm.lower() != 'true' and nsfm != '':
+            sql += " AND nsfm=false"
 
         with settings.db() as conn:
             with conn.cursor() as cur:
@@ -85,7 +88,7 @@ class Session(object):
 
     # Public attributes
     ATTRS = ('host', 'port', 'id', 'protocol', 'title',
-             'users', 'password', 'owner', 'started')
+             'users', 'password', 'nsfm', 'owner', 'started')
 
     def __init__(self, **kwargs):
         for k, v in kwargs.iteritems():
@@ -115,6 +118,9 @@ class Session(object):
                 if data.get('owner', None):
                     set_sql.append('owner=%s')
                     params.append(data['owner'])
+
+                if data.get('nsfm', 'false').lower() != 'false' or is_nsfm_title(data.get('title', '')):
+                    set_sql.append('nsfm=true')
 
                 sql = 'UPDATE drawpile_sessions SET ' +\
                     ', '.join(set_sql) +\
@@ -171,8 +177,8 @@ class Session(object):
                 raise cherrypy.HTTPError(422, "BADDATA:Invalid port number")
 
         sql = '''INSERT INTO drawpile_sessions
-			(host, port, session_id, protocol, owner, title, users, password, update_key, client_ip) 
-			VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s) RETURNING id'''
+			(host, port, session_id, protocol, owner, title, users, password, nsfm, update_key, client_ip) 
+			VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) RETURNING id'''
 
         with settings.db() as conn:
             with conn.cursor() as cur:
@@ -209,6 +215,7 @@ class Session(object):
                         data.get('title', ''),
                         data['users'],
                         data.get('password', False),
+                        data.get('nsfm', False) or is_nsfm_title(data.get('title', '')),
                         update_key,
                         client_ip
                     ))
@@ -235,6 +242,18 @@ def error422(status, message, traceback, version):
         'message': msg
     })
 
+def is_nsfm_title(title):
+    title = title.lower()
+    for word in settings.NSFM_WORDS:
+        if hasattr(word, 'search'):
+            if word.search(title):
+                return True
+
+        elif word in title:
+                return True
+
+    return False
+
 if __name__ == '__main__':
     conf = {
         '/': {
@@ -246,3 +265,4 @@ if __name__ == '__main__':
         }
     }
     cherrypy.quickstart(SessionListingApi(), '/', conf)
+

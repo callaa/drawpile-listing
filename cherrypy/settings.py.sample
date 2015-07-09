@@ -12,9 +12,13 @@ SESSION_TIMEOUT = '15 minutes'
 # Maximum number of simultaneous announcements
 RATELIMIT = 5
 
+# List of substrings or regular expressions matched against the session title.
+# In case of a match, the "Not Suitable For Minors" tag will be set.
+# Note: the title will be lowercased before matching
+NSFM_WORDS = ['nsfw', 'nsfm']
+
 # A function for opening a database connection
 import psycopg2 as dbdriver
-
-
 def db():
     return dbdriver.connect("dbname=drawpile")
+
