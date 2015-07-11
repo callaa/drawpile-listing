@@ -71,6 +71,7 @@ class Sessions(object):
         return {
             'id': pk,
             'key': updatekey,
+			'message': settings.WELCOME_MESSAGE,
         }
 
     def _cp_dispatch(self, vpath):

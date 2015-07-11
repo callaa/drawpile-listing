@@ -3,6 +3,8 @@ NAME = "My Test Server"
 DESCRIPTION = """A short description of the server. This will be shown in
 Drawpile's listing server list."""
 
+WELCOME_MESSAGE = "You are using " + NAME + " announcement server!"
+
 # URL to favicon
 FAVICON = ''
 
