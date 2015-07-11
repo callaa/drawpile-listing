@@ -48,6 +48,8 @@ class Sessions(object):
         if nsfm.lower() != 'true' and nsfm != '':
             sql += " AND nsfm=false"
 
+        sql += " ORDER BY title ASC"
+
         with settings.db() as conn:
             with conn.cursor() as cur:
                 cur.execute(sql, params)
