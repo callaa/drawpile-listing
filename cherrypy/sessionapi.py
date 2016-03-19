@@ -6,6 +6,8 @@ import re
 import json
 import datetime
 
+from jsonptools import jsonp_handler
+
 SESSION_ID_RE = re.compile(r'^[a-zA-Z0-9:-]{1,64}$')
 
 
@@ -263,6 +265,7 @@ if __name__ == '__main__':
             'request.dispatch': cherrypy.dispatch.MethodDispatcher(),
             'tools.json_in.on': True,
             'tools.json_out.on': True,
+            'tools.json_out.handler': jsonp_handler,
             'error_page.422': error422,
             'request.show_tracebacks': False,
         }
