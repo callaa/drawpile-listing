@@ -22,7 +22,7 @@ class SessionListingApi(object):
     def GET(self):
         return {
             'api_name': 'drawpile-session-list',
-            'version': '1.1',
+            'version': '1.2',
             'name': settings.NAME,
             'description': settings.DESCRIPTION,
             'favicon': settings.FAVICON,
@@ -38,7 +38,7 @@ class Sessions(object):
         """Get list of active sessions"""
 
         sql = '''
-			SELECT host, port, session_id as id, protocol, owner, title, users, password, nsfm, started
+			SELECT host, port, session_id as id, protocol, owner, title, users, password, nsfm, started, usernames
 			FROM drawpile_sessions
 			WHERE unlisted=false AND last_active >= current_timestamp - interval %s'''
         params = [settings.SESSION_TIMEOUT]
@@ -93,7 +93,7 @@ class Session(object):
 
     # Public attributes
     ATTRS = ('host', 'port', 'id', 'protocol', 'title',
-             'users', 'password', 'nsfm', 'owner', 'started')
+             'users', 'password', 'nsfm', 'owner', 'started', 'usernames')
 
     def __init__(self, **kwargs):
         for k, v in kwargs.iteritems():
@@ -126,6 +126,10 @@ class Session(object):
 
                 if data.get('nsfm', 'false').lower() != 'false' or is_nsfm_title(data.get('title', '')):
                     set_sql.append('nsfm=true')
+
+                if 'usernames' in data:
+                    set_sql.append('usernames=%s')
+                    params.append(sanitize_usernames(data['usernames']))
 
                 sql = 'UPDATE drawpile_sessions SET ' +\
                     ', '.join(set_sql) +\
@@ -182,8 +186,8 @@ class Session(object):
                 raise cherrypy.HTTPError(422, "BADDATA:Invalid port number")
 
         sql = '''INSERT INTO drawpile_sessions
-			(host, port, session_id, protocol, owner, title, users, password, nsfm, update_key, client_ip) 
-			VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) RETURNING id'''
+			(host, port, session_id, protocol, owner, title, users, usernames, password, nsfm, update_key, client_ip) 
+			VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) RETURNING id'''
 
         with settings.db() as conn:
             with conn.cursor() as cur:
@@ -219,6 +223,7 @@ class Session(object):
                         data['owner'],
                         data.get('title', ''),
                         data['users'],
+                        sanitize_usernames(data.get('usernames', [])),
                         data.get('password', False),
                         data.get('nsfm', False) or is_nsfm_title(data.get('title', '')),
                         update_key,
@@ -258,6 +263,9 @@ def is_nsfm_title(title):
                 return True
 
     return False
+
+def sanitize_usernames(usernames):
+    return [name[0:22] for name in usernames if name]
 
 if __name__ == '__main__':
     conf = {

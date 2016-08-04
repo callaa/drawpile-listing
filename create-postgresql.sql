@@ -6,6 +6,7 @@ CREATE TABLE drawpile_sessions (
 	protocol VARCHAR(64) NOT NULL,
 	title VARCHAR(255) NOT NULL,
 	users INT NOT NULL,
+	usernames VARCHAR(22) ARRAY,
 	password BOOLEAN NOT NULL,
 	nsfm BOOLEAN NOT NULL,
 	owner VARCHAR(128) NOT NULL,

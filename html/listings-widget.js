@@ -55,7 +55,16 @@ function refreshSessionList(list) {
 
 			row.append($('<td></td>').text(s.owner));
 
-			row.append($('<td></td>').text(s.users));
+			var users = $('<td></td>');
+			if($.isArray(s.usernames) && s.usernames.length > 0) {
+				users.append($("<abbr></abbr>")
+					.text(s.users)
+					.attr("title", s.usernames.join(", "))
+					);
+			} else {
+				users.text(s.users);
+			}
+			row.append(users);
 
 			var started = Date.parse(s.started.replace(' ', 'T') + "+00:00");
 			var uptime = (now - started) / (1000*60);
