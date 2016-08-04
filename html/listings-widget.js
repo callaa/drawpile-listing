@@ -33,6 +33,8 @@ function refreshSessionList(list) {
 		return;
 	}
 
+	list = $.grep(list, function(n, i) { return n.title.length>0 });
+
 	if(list.length>0) {
 		var now = Date.now();
 		for(var i=0;i<list.length;++i) {
