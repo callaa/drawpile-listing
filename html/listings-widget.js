@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2015-2016 Calle Laakkonen
+Copyright (c) 2015-2017 Calle Laakkonen
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -22,7 +22,11 @@ THE SOFTWARE.
 
 (function($) {
 
-var CURRENT_VERSION = "15.6";
+var DEFAULT_FLAIR = '<i class="fa fa-archive"></i>';
+var VERSION_FLAIR = {
+	'15.6': '',
+	'dp:4.20.1': '<b>beta</b>'
+};
 
 function refreshSessionList(list) {
 	var tb = $("#session-list tbody");
@@ -41,14 +45,14 @@ function refreshSessionList(list) {
 			var s = list[i];
 			var row = $('<tr></tr>');
 
-			var title = $('<td></td>');
+			var flair = $('<td></td>');
 			if(s.password) {
-				row.append('<td><i class="fa fa-key" title="Password required"></i></td>');
-			} else if(s.protocol !== CURRENT_VERSION) {
-				row.append('<td><i class="fa fa-archive" title="Old version"></i></td>');
-			} else {
-				row.append('<td></td>');
+				flair.append('<i class="fa fa-key" title="Password required"></i>');
 			}
+			flair.append(VERSION_FLAIR[s.protocol] || DEFAULT_FLAIR);
+			row.append(flair);
+
+			var title = $('<td></td>');
 			$('<a></a>')
 				.attr('href', 'drawpile://' + s.host + (s.port != 27750 ? ':' + s.port : '') + '/' + s.id)
 				.text(s.title)
