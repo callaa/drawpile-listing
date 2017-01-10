@@ -44,8 +44,9 @@ class Sessions(object):
         params = [settings.SESSION_TIMEOUT]
 
         if protocol:
-            sql += " AND protocol=%s"
-            params.append(protocol)
+            protocols = [p for p in protocol.split(',') if p]
+            sql += " AND protocol IN (" + ",".join(["%s"]*len(protocols)) + ")"
+            params += protocols
 
         if nsfm.lower() != 'true' and nsfm != '':
             sql += " AND nsfm=false"
