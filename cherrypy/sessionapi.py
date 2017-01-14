@@ -125,8 +125,12 @@ class Session(object):
                     set_sql.append('owner=%s')
                     params.append(data['owner'])
 
-                if data.get('nsfm', 'false').lower() != 'false' or is_nsfm_title(data.get('title', '')):
-                    set_sql.append('nsfm=true')
+                is_nsfm = data.get('nsfm', None)
+                if is_nsfm_title(data.get('title', '')):
+                    is_nsfm = True
+
+                if is_nsfm is not None:
+                    set_sql.append('nsfm=true' if is_nsfm else 'nsfm=false')
 
                 if 'usernames' in data:
                     set_sql.append('usernames=%s')

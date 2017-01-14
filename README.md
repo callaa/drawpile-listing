@@ -15,6 +15,8 @@ from accumulating.
 
 ## Installing the PHP based server
 
+Note! The PHP version is currently outdated and not recommended for use.
+
 Copy the contents of `php/` to your server. Remember to copy the `.htaccess` file as well!
 
 Rename or copy `config.php.sample` to `config.php` and modify the the settings
