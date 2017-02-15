@@ -3,6 +3,8 @@ Drawpile Public Listing Server
 
 This is a collection of sample implementations of a Drawpile public listing server.
 
+**Note:** these are now obsolete and unmaintained. The current version is at [drawpile/listserver](https://github.com/drawpile/listserver).
+
 To install, first create the database. Scripts are provided for MySQL/MariaDB and Postgresql.
 The PHP based server uses MySQL and the Python based on Postgresql.
 
